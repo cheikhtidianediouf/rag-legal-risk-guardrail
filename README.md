@@ -1,89 +1,83 @@
-RAG Legal & Financial Risk Guardrail
-Système MLOps complet d'analyse de conformité contractuelle avec RAG, évaluation de qualité en temps réel et détection d'hallucinations.
+# ⚖️ RAG Legal & Financial Risk Guardrail
 
-📌 Context & Problem Statement
-Dans les secteurs juridique et financier, l'utilisation de modèles d'IA générative (LLM) pour analyser des contrats complexes ou des rapports financiers présente un risque critique : les hallucinations et l'imprécision des réponses. Une clause mal interprétée ou une fausse information générée peut entraîner des conséquences juridiques et financières majeures.
+Une application MLOps et LLM prête pour la production, conçue pour analyser des contrats juridiques complexes, les indexer dans une base vectorielle locale, effectuer une recherche sémantique (RAG) et auditer automatiquement les accords pour détecter les risques financiers et juridiques à l'aide d'un garde-fou personnalisé (**Risk Guardrail**).
 
-RAG Legal Risk Guardrail résout ce problème en combinant une architecture RAG (Retrieval-Augmented Generation), un modèle de scoring prédictif (XGBoost) et un pipeline de suivi MLOps (MLflow, Docker, CI/CD). Le système évalue en temps réel la fiabilité des réponses générées avant leur présentation à l'utilisateur final.
+---
 
-🎯 Key Features
-Retrieval-Augmented Generation (RAG) : Extraction automatique et ciblée de clauses juridiques à partir du benchmark CUAD (Contract Understanding Atticus Dataset).
+## 🚀 Fonctionnalités Clés
 
-Dual-Layer Guardrail System :
+* **Pipeline de Données Automatisé :** Télécharge et traite les contrats juridiques depuis le jeu de données officiel CUAD (*Contract Understanding Atticus Dataset*) via Hugging Face.
+* **Parsing PDF Avancé :** Extrait le texte intégral de documents juridiques multi-pages grâce à la bibliothèque `pdfplumber`.
+* **Recherche Sémantique (RAG) :** Découpe les contrats longs en morceaux (*chunks*) et les indexe à l'aide de `Sentence-Transformers` (`all-MiniLM-L6-v2`) au sein d'une base vectorielle persistante `ChromaDB`.
+* **Garde-fou de Risques (*Risk Guardrail*) :** Scanne automatiquement les clauses récupérées à la recherche de mots-clés déclencheurs de risques juridiques et financiers (ex: *unlimited liability*, *damages*, *penalties*) pour classifier le niveau de risque (**Élevé**, **Moyen**, **Faible**) avec des recommandations exploitables.
+* **Interface Web Interactive :** Développée avec **Streamlit** pour une expérience utilisateur fluide et en temps réel.
 
-Évaluation dynamique LLM-as-a-Judge : Calcul des scores de pertinence (context recall, faithfulness, answer relevancy).
+---
 
-Predictive Quality Scoring (XGBoost) : Modèle Machine Learning supervisé prédisant le niveau de risque ou d'hallucination d'une réponse à partir de métriques comportementales et statistiques.
+## 🛠️ Stack Technique
 
-MLOps & Observability : Tracking complet des expériences, des métriques et du versionnement de modèles via MLflow.
+* **Langage :** Python 3.12
+* **Traitement des données :** Pandas, Hugging Face `datasets`, `pdfplumber`
+* **Embeddings & Base Vectorielle :** `sentence-transformers`, `chromadb`
+* **Interface & Ops :** `streamlit`, Architecture projet modulaire MLOps
 
-Production-Ready Architecture :
+---
 
-API RESTful (FastAPI) exposant les fonctionnalités d'analyse et d'évaluation.
+## 📂 Structure du Projet
 
-Dashboard Interactif (Streamlit) pour la démonstration temps réel.
-
-Containerisation (Docker) & Intégration Continue (GitHub Actions).
-
-🛠️ Tech Stack
-Language & Core : Python 3.10+, Pandas, NumPy, Pydantic
-
-RAG & Vector Storage : LangChain / LlamaIndex, ChromaDB, Sentence-Transformers
-
-ML & Evaluation : XGBoost, Scikit-Learn, LLM-as-a-Judge
-
-MLOps & Monitoring : MLflow, Pytest
-
-API & Frontend : FastAPI, Uvicorn, Streamlit
-
-DevOps : Docker, GitHub Actions
-
-
-🏗️ System Architecture
-
-				  +---------------------------------------+
-                                  |         Contract / Document           |
-                                  +---------------------------------------+
-                                                      |
-                                                      v
-                                      +-------------------------------+
-                                      |    VectorDB & RAG Engine      |
-                                      +-------------------------------+
-                                                      |
-                                                      v
-                                      +-------------------------------+
-                                      |     Generated LLM Answer      |
-                                      +-------------------------------+
-                                                      |
-                                                      v
-+---------------------------------+   +-------------------------------+
-| Metrics Extraction (RAGAS/Lang) |-->|   XGBoost Quality Guardrail   |
-+---------------------------------+   +-------------------------------+
-                                                      |
-                                                      v
-                                      +-------------------------------+
-                                      | Score de Risque & Validation  |
-                                      +-------------------------------+
-                                                      |
-                                                      v
-                                      +-------------------------------+
-                                      |   FastAPI & Streamlit UI      |
-                                      +-------------------------------+
-
-
-📁 Repository Structure
-
-rag-legal-risk-guardrail/
-├── data/                  # Jeux de données (Raw & Processed CUAD)
-├── notebooks/             # Exploratoire, prototypage RAG & XGBoost
+```text
+Proet RAG-RISK/
+│
+├── data/
+│   ├── raw/                 # Fichiers bruts du dataset
+│   ├── processed/           # CSVs nettoyés (cuad_processed.csv)
+│   └── vector_db/           # Stockage persistant ChromaDB
+│
 ├── src/
-│   ├── data_loader.py     # Ingestion & préparation des données
-│   ├── rag_engine.py      # Pipeline RAG & Vector Database (ChromaDB)
-│   ├── evaluator.py       # Extraction de métriques & Modèle XGBoost
-│   └── api.py             # API REST (FastAPI)
-├── app/
-│   └── dashboard.py       # Interface utilisateur (Streamlit)
-├── tests/                 # Tests unitaires & d'intégration (Pytest)
-├── Dockerfile             # Containerisation pour la mise en production
-├── requirements.txt       # Dépendances du projet
-└── README.md              # Documentation du projet
+│   ├── data_loader.py       # Pipeline d'ingestion et de parsing PDF
+│   ├── indexer.py           # Chunking et génération des embeddings vectoriels
+│   └── rag_pipeline.py      # Moteur de recherche sémantique + Risk Guardrail
+│
+├── venv/                    # Environnement virtuel Python
+├── app.py                   # Application Web Streamlit
+└── README.md                # Documentation du projet
+
+
+⚙️ Installation & Configuration
+Cloner le dépôt :
+
+git clone [https://github.com/votre-nom-dutilisateur/rag-legal-risk-guardrail.git](https://github.com/votre-nom-dutilisateur/rag-legal-risk-guardrail.git)
+cd Proet RAG-RISK
+
+Créer et activer un environnement virtuel (Python 3.12 recommandé) :
+
+python -m venv venv
+venv\Scripts\activate  # Sous Windows
+
+Installer les dépendances :
+
+pip install pandas datasets pdfplumber sentence-transformers chromadb streamlit
+
+🚀 Guide d'Exécution : 
+
+Étape 1 : Ingestion et Traitement des Contrats
+Télécharge et parse les contrats PDF bruts pour les structurer :
+
+python src/data_loader.py
+
+Étape 2 : Construction de l'Index Vectoriel
+Découpe le texte et stocke les embeddings en local dans ChromaDB :
+
+python src/indexer.py
+
+Étape 3 : Tester le Pipeline RAG & Guardrail en CLI
+Exécute une requête de recherche sémantique et une évaluation des risques en console :
+
+python src/rag_pipeline.py
+
+Étape 4 : Lancer l'Interface Web (Streamlit)
+Démarre le tableau de bord interactif :
+
+streamlit run app.py
+
+

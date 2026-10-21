@@ -1,0 +1,14 @@
+# Environnement virtuel
+venv/
+
+# Base vectorielle ChromaDB et données lourdes
+data/vector_db/
+data/raw/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
